@@ -182,14 +182,14 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
         → ⟦ P true-[ Γ ] ⟧
 
     -- Every derivation in the logical theory has a corresponding derivation in the computational type theory.
-    _↑ : ∀ {Γ P} → Logic.⟦ P true-[ Γ ] ⟧ → ⟦ P true-[ Γ ] ⟧
-    Logic.⊤-intro _ ↑ = ⊤-intro
-    Logic.⊥-elim _ D ↑ = ⊥-elim (D ↑)
-    Logic.⊃-intro⟨ x ⟩ _ D ↑ = ⊃-intro⟨ x ⟩ (D ↑)
-    Logic.⊃-elim _ D E ↑ = ⊃-elim (D ↑) (E ↑)
-    Logic.hyp⟨_⟩ x D E F ↑ = hyp⟨ x ⟩ E F
+    ⌜_⌝ : ∀ {Γ P} → Logic.⟦ P true-[ Γ ] ⟧ → ⟦ P true-[ Γ ] ⟧
+    ⌜ Logic.⊤-intro _ ⌝ = ⊤-intro
+    ⌜ Logic.⊥-elim _ D ⌝ = ⊥-elim ⌜ D ⌝
+    ⌜ Logic.⊃-intro⟨ x ⟩ _ D ⌝ = ⊃-intro⟨ x ⟩ ⌜ D ⌝
+    ⌜ Logic.⊃-elim _ D E ⌝ = ⊃-elim ⌜ D ⌝ ⌜ E ⌝
+    ⌜ Logic.hyp⟨_⟩ x D E F ⌝ = hyp⟨ x ⟩ E F
 
-    -- Every derivation in the computational type theory also may have a witness extracted from it.
+    -- Every derivation in the computational type theory also may have a witness/realizer extracted from it.
     _° : ∀ {J} → ⟦ J ⟧ → term
     ⊤-intro ° = •
     ⊥-elim D ° = abort D °
@@ -204,7 +204,7 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
     hyp-eq⟨_⟩ _ _ _ ° = •
 
     -- The computational realizers are well-typed in the type theory.
-    coh : ∀ {Γ P} (D : Logic.⟦ P true-[ Γ ] ⟧) → ⟦ D ↑ ° ∈ P [ Γ ] ⟧
+    coh : ∀ {Γ P} (D : Logic.⟦ P true-[ Γ ] ⟧) → ⟦ ⌜ D ⌝ ° ∈ P [ Γ ] ⟧
     coh (Logic.⊤-intro _) = ⊤-member-eq
     coh (Logic.⊥-elim _ D) = ⊥-elim-eq (coh D)
     coh (Logic.⊃-intro⟨ x ⟩ _ D) = ⊃-member-eq⟨ x ⟩ (coh D)
