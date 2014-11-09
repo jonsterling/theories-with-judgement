@@ -224,8 +224,11 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
     coh (Logic.hyp⟨ x ⟩ _ D E) = hyp-eq⟨ x ⟩ D E
 
     module example {x : name} where
-      test : ⟦ λ⟨ x ⟩ abort var⟨ x ⟩ ∈ ⊥ ⊃ ⊤ [ · ] ⟧
-      test = ⊃-member-eq⟨ x ⟩ (⊥-elim-eq (hyp-eq⟨ x ⟩ auto auto))
+      ex₁ : ⟦ λ⟨ x ⟩ abort var⟨ x ⟩ ∈ ⊥ ⊃ ⊤ [ · ] ⟧
+      ex₁ = ⊃-member-eq⟨ x ⟩ (⊥-elim-eq (hyp-eq⟨ x ⟩ auto auto))
 
-      test₂ : ⟦ ⊥ ⊃ ⊤ true-[ · ] ⟧
-      test₂ = ⊃-intro⟨ x ⟩ (⊥-elim (hyp⟨ x ⟩ auto auto))
+      ex₂ : ⟦ ⊥ ⊃ ⊤ true-[ · ] ⟧
+      ex₂ = ⊃-intro⟨ x ⟩ (⊥-elim (hyp⟨ x ⟩ auto auto))
+
+      ex₃ : ⟦ ⊥ ⊃ ⊤ true-[ · ] ⟧
+      ex₃ = witness⟨ λ⟨ x ⟩ abort var⟨ x ⟩  ⟩ ex₁
