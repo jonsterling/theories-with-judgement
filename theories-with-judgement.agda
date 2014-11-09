@@ -134,7 +134,7 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
 
     data ⟦_⟧ where
 
-      eq-sym : ∀ {Γ M N A}
+      eq-sym_ : ∀ {Γ M N A}
         → ⟦ M == N ∈ A [ Γ ] ⟧
         → ⟦ N == M ∈ A [ Γ ] ⟧
 
@@ -148,17 +148,17 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
       ⊤-member-eq : ∀ {Γ}
         → ⟦ • ∈ ⊤ [ Γ ] ⟧
 
-      ⊥-elim : ∀ {Γ P}
+      ⊥-elim_ : ∀ {Γ P}
         → ⟦ ⊥ true-[ Γ ] ⟧
         → ⟦ P true-[ Γ ] ⟧
-      ⊥-elim-eq : ∀ {Γ M N P}
+      ⊥-elim-eq_ : ∀ {Γ M N P}
         → ⟦ M == N ∈ ⊥ [ Γ ] ⟧
         → ⟦ abort M == abort N ∈ P [ Γ ] ⟧
 
-      ⊃-intro⟨_⟩ : ∀ x {Γ P Q}
+      ⊃-intro⟨_⟩_ : ∀ x {Γ P Q}
         → ⟦ Q true-[ Γ , x ∶ P true-[ Γ ] ] ⟧
         → ⟦ P ⊃ Q true-[ Γ ] ⟧
-      ⊃-member-eq⟨_⟩ : ∀ x {Γ M N P Q}
+      ⊃-member-eq⟨_⟩_ : ∀ x {Γ M N P Q}
         → ⟦ M == N ∈ Q [ Γ , x ∶ P true-[ Γ ] ] ⟧ 
         → ⟦ λ⟨ x ⟩ M == λ⟨ x ⟩ N ∈ P ⊃ Q [ Γ ] ⟧
 
@@ -180,7 +180,7 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
            ⦃ _ : Ctx.⟦ Δ ≤ Γ ⟧ ⦄
         → ⟦ var⟨ x ⟩ ∈ P [ Γ ] ⟧
 
-      witness⟨_⟩ : ∀ M {Γ P}
+      witness⟨_⟩_ : ∀ M {Γ P}
         → ⟦ M ∈ P [ Γ ] ⟧
         → ⟦ P true-[ Γ ] ⟧
 
@@ -195,33 +195,33 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
     -- Every derivation in the computational type theory also may have a witness/realizer extracted from it.
     _° : ∀ {J} → ⟦ J ⟧ → term
     ⊤-intro ° = •
-    ⊥-elim D ° = abort D °
-    ⊃-intro⟨ x ⟩ D ° = λ⟨ x ⟩ D °
+    (⊥-elim D) ° = abort D °
+    (⊃-intro⟨ x ⟩ D) ° = λ⟨ x ⟩ D °
     ⊃-elim D E ° = app (D °) (E °)
     hyp⟨ x ⟩ ° = var⟨ x ⟩
-    witness⟨ M ⟩ D ° = M
+    (witness⟨ M ⟩ D) ° = M
     ⊤-member-eq ° = •
-    ⊥-elim-eq _ ° = •
-    ⊃-member-eq⟨_⟩ _ _ ° = •
+    (⊥-elim-eq _) ° = •
+    (⊃-member-eq⟨ x ⟩ _) ° = •
     ⊃-elim-eq _ _ ° = •
     hyp-eq⟨ x ⟩ ° = •
-    eq-sym _ ° = •
+    (eq-sym _) ° = •
     eq-trans _ _ ° = •
 
     -- The computational realizers are well-typed in the type theory.
     coh : ∀ {Γ P} (D : Logic.⟦ P true-[ Γ ] ⟧) → ⟦ ⌜ D ⌝ ° ∈ P [ Γ ] ⟧
     coh Logic.⊤-intro = ⊤-member-eq
-    coh (Logic.⊥-elim D) = ⊥-elim-eq (coh D)
-    coh (Logic.⊃-intro⟨ x ⟩ D) = ⊃-member-eq⟨ x ⟩ (coh D)
+    coh (Logic.⊥-elim D) = ⊥-elim-eq coh D
+    coh (Logic.⊃-intro⟨ x ⟩ D) = ⊃-member-eq⟨ x ⟩ coh D
     coh (Logic.⊃-elim D E) = ⊃-elim-eq (coh D) (coh E)
     coh (Logic.hyp⟨ x ⟩) = hyp-eq⟨ x ⟩
 
     module example {x : name} where
       ex₁ : ⟦ λ⟨ x ⟩ abort var⟨ x ⟩ ∈ ⊥ ⊃ ⊤ [ · ] ⟧
-      ex₁ = ⊃-member-eq⟨ x ⟩ (⊥-elim-eq hyp-eq⟨ x ⟩)
+      ex₁ = ⊃-member-eq⟨ x ⟩ ⊥-elim-eq hyp-eq⟨ x ⟩
 
       ex₂ : ⟦ ⊥ ⊃ ⊤ true-[ · ] ⟧
-      ex₂ = ⊃-intro⟨ x ⟩ (⊥-elim (hyp⟨ x ⟩))
+      ex₂ = ⊃-intro⟨ x ⟩ ⊥-elim hyp⟨ x ⟩
 
       ex₃ : ⟦ ⊥ ⊃ ⊤ true-[ · ] ⟧
       ex₃ = witness⟨ λ⟨ x ⟩ abort var⟨ x ⟩  ⟩ ex₁
