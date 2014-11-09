@@ -2,9 +2,6 @@
 
 module theories-with-judgement where
 
-auto : {P : Set} ⦃ M : P ⦄ → P
-auto ⦃ M ⦄ = M
-
 module Framework (name : Set) (_≠_ : name → name → Set) where
   record Theory : Set where
     field
@@ -80,30 +77,26 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
     thy = record { term = term ; judgement = judgement ; ⟦_⟧ = ⟦_⟧ }
 
     data ⟦_⟧ where
-      ⊤-intro : ∀ {Γ}
-        → Ctx.⟦ Γ ctx ⟧
+      ⊤-intro : ∀ {Γ} ⦃ _ : Ctx.⟦ Γ ctx ⟧ ⦄
         → ⟦ ⊤ true-[ Γ ] ⟧
 
-      ⊥-elim : ∀ {Γ P}
-        → Ctx.⟦ Γ ctx ⟧
+      ⊥-elim : ∀ {Γ P} ⦃ _ : Ctx.⟦ Γ ctx ⟧ ⦄
         → ⟦ ⊥ true-[ Γ ] ⟧
         → ⟦ P true-[ Γ ] ⟧
 
-      ⊃-intro⟨_⟩ : ∀ x {Γ P Q}
-        → Ctx.⟦ Γ ctx ⟧
+      ⊃-intro⟨_⟩ : ∀ x {Γ P Q} ⦃ _ : Ctx.⟦ Γ ctx ⟧ ⦄
         → ⟦ Q true-[ Γ , x ∶ P true-[ Γ ] ] ⟧
         → ⟦ P ⊃ Q true-[ Γ ] ⟧
 
-      ⊃-elim : ∀ {Γ P Q}
-        → Ctx.⟦ Γ ctx ⟧
+      ⊃-elim : ∀ {Γ P Q} ⦃ _ : Ctx.⟦ Γ ctx ⟧ ⦄
         → ⟦ P ⊃ Q true-[ Γ ] ⟧
         → ⟦ P true-[ Γ ] ⟧
         → ⟦ Q true-[ Γ ] ⟧
 
       hyp⟨_⟩ : ∀ x {Γ Δ P}
-        → Ctx.⟦ Γ ctx ⟧
-        → Ctx.⟦ Γ ∋ x ∶ (P true-[ Δ ]) ⟧
-        → Ctx.⟦ Δ ≤ Γ ⟧
+           ⦃ _ : Ctx.⟦ Γ ctx ⟧ ⦄
+           ⦃ _ : Ctx.⟦ Γ ∋ x ∶ (P true-[ Δ ]) ⟧ ⦄
+           ⦃ _ : Ctx.⟦ Δ ≤ Γ ⟧ ⦄
         → ⟦ P true-[ Γ ] ⟧
 
   -- A simple "computational type theory". Note that the
@@ -179,12 +172,12 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
         → ⟦ app M N == app M′ N′ ∈ Q [ Γ ] ⟧
 
       hyp⟨_⟩ : ∀ x {Γ Δ P}
-        → Ctx.⟦ Γ ∋ x ∶ (P true-[ Δ ]) ⟧
-        → Ctx.⟦ Δ ≤ Γ ⟧
+           ⦃ _ : Ctx.⟦ Γ ∋ x ∶ (P true-[ Δ ]) ⟧ ⦄
+           ⦃ _ : Ctx.⟦ Δ ≤ Γ ⟧ ⦄
         → ⟦ P true-[ Γ ] ⟧
       hyp-eq⟨_⟩ : ∀ x {Γ Δ P}
-        → Ctx.⟦ Γ ∋ x ∶ (P true-[ Δ ]) ⟧
-        → Ctx.⟦ Δ ≤ Γ ⟧
+           ⦃ _ : Ctx.⟦ Γ ∋ x ∶ (P true-[ Δ ]) ⟧ ⦄
+           ⦃ _ : Ctx.⟦ Δ ≤ Γ ⟧ ⦄
         → ⟦ var⟨ x ⟩ ∈ P [ Γ ] ⟧
 
       witness⟨_⟩ : ∀ M {Γ P}
@@ -193,11 +186,11 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
 
     -- Every derivation in the logical theory has a corresponding derivation in the computational type theory.
     ⌜_⌝ : ∀ {Γ P} → Logic.⟦ P true-[ Γ ] ⟧ → ⟦ P true-[ Γ ] ⟧
-    ⌜ Logic.⊤-intro _ ⌝ = ⊤-intro
-    ⌜ Logic.⊥-elim _ D ⌝ = ⊥-elim ⌜ D ⌝
-    ⌜ Logic.⊃-intro⟨ x ⟩ _ D ⌝ = ⊃-intro⟨ x ⟩ ⌜ D ⌝
-    ⌜ Logic.⊃-elim _ D E ⌝ = ⊃-elim ⌜ D ⌝ ⌜ E ⌝
-    ⌜ Logic.hyp⟨_⟩ x D E F ⌝ = hyp⟨ x ⟩ E F
+    ⌜ Logic.⊤-intro ⌝ = ⊤-intro
+    ⌜ Logic.⊥-elim D ⌝ = ⊥-elim ⌜ D ⌝
+    ⌜ Logic.⊃-intro⟨ x ⟩ D ⌝ = ⊃-intro⟨ x ⟩ ⌜ D ⌝
+    ⌜ Logic.⊃-elim D E ⌝ = ⊃-elim ⌜ D ⌝ ⌜ E ⌝
+    ⌜ Logic.hyp⟨_⟩ x ⌝ = hyp⟨ x ⟩ 
 
     -- Every derivation in the computational type theory also may have a witness/realizer extracted from it.
     _° : ∀ {J} → ⟦ J ⟧ → term
@@ -205,30 +198,30 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
     ⊥-elim D ° = abort D °
     ⊃-intro⟨ x ⟩ D ° = λ⟨ x ⟩ D °
     ⊃-elim D E ° = app (D °) (E °)
-    hyp⟨ x ⟩ _ _ ° = var⟨ x ⟩
+    hyp⟨ x ⟩ ° = var⟨ x ⟩
     witness⟨ M ⟩ D ° = M
     ⊤-member-eq ° = •
     ⊥-elim-eq _ ° = •
     ⊃-member-eq⟨_⟩ _ _ ° = •
     ⊃-elim-eq _ _ ° = •
-    hyp-eq⟨_⟩ _ _ _ ° = •
+    hyp-eq⟨ x ⟩ ° = •
     eq-sym _ ° = •
     eq-trans _ _ ° = •
 
     -- The computational realizers are well-typed in the type theory.
     coh : ∀ {Γ P} (D : Logic.⟦ P true-[ Γ ] ⟧) → ⟦ ⌜ D ⌝ ° ∈ P [ Γ ] ⟧
-    coh (Logic.⊤-intro _) = ⊤-member-eq
-    coh (Logic.⊥-elim _ D) = ⊥-elim-eq (coh D)
-    coh (Logic.⊃-intro⟨ x ⟩ _ D) = ⊃-member-eq⟨ x ⟩ (coh D)
-    coh (Logic.⊃-elim _ D E) = ⊃-elim-eq (coh D) (coh E)
-    coh (Logic.hyp⟨ x ⟩ _ D E) = hyp-eq⟨ x ⟩ D E
+    coh Logic.⊤-intro = ⊤-member-eq
+    coh (Logic.⊥-elim D) = ⊥-elim-eq (coh D)
+    coh (Logic.⊃-intro⟨ x ⟩ D) = ⊃-member-eq⟨ x ⟩ (coh D)
+    coh (Logic.⊃-elim D E) = ⊃-elim-eq (coh D) (coh E)
+    coh (Logic.hyp⟨ x ⟩) = hyp-eq⟨ x ⟩
 
     module example {x : name} where
       ex₁ : ⟦ λ⟨ x ⟩ abort var⟨ x ⟩ ∈ ⊥ ⊃ ⊤ [ · ] ⟧
-      ex₁ = ⊃-member-eq⟨ x ⟩ (⊥-elim-eq (hyp-eq⟨ x ⟩ auto auto))
+      ex₁ = ⊃-member-eq⟨ x ⟩ (⊥-elim-eq hyp-eq⟨ x ⟩)
 
       ex₂ : ⟦ ⊥ ⊃ ⊤ true-[ · ] ⟧
-      ex₂ = ⊃-intro⟨ x ⟩ (⊥-elim (hyp⟨ x ⟩ auto auto))
+      ex₂ = ⊃-intro⟨ x ⟩ (⊥-elim (hyp⟨ x ⟩))
 
       ex₃ : ⟦ ⊥ ⊃ ⊤ true-[ · ] ⟧
       ex₃ = witness⟨ λ⟨ x ⟩ abort var⟨ x ⟩  ⟩ ex₁
