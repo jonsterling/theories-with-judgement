@@ -1,23 +1,23 @@
-{-# OPTIONS --type-in-type #-}
-
 module theories-with-judgement where
 
+open import Agda.Primitive
+
 module Framework (name : Set) (_≠_ : name → name → Set) where
-  record Theory : Set where
+  record Theory {i} : Set (lsuc i) where
     field
-      term : Set 
-      judgement : Set
-      ⟦_⟧ : judgement → Set
+      term : Set i
+      judgement : Set i
+      ⟦_⟧ : judgement → Set i
   
-  module Contexts (T : Theory) where
+  module Contexts {i} (T : Theory {i}) where
     module T = Theory T
 
-    data term : Set where
+    data term : Set i where
       · : term
       _,_∶_ : term → name → T.judgement → term
     infixl 9 _,_∶_
 
-    data judgement : Set where
+    data judgement : Set i where
       _ctx : term → judgement
       _∉_ : name → term → judgement
       _∋_∶_ : term → name → T.judgement → judgement
@@ -27,7 +27,7 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
     infixr 8 _∉_
     infixr 8 _≤_
     
-    data ⟦_⟧ : judgement → Set where
+    data ⟦_⟧ : judgement → Set i where
       ·-ctx : ⟦ · ctx ⟧
       Γ,x∶J-ctx : ∀ {Γ x J}
         → ⟦ Γ ctx ⟧
