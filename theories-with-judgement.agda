@@ -2,7 +2,14 @@ module theories-with-judgement where
 
 open import Agda.Primitive
 
-module Framework (name : Set) (_≠_ : name → name → Set) where
+record Nominal : Set₁ where
+  field
+    name : Set
+    _≠_ : name → name → Set
+
+module Framework (N : Nominal) where
+  module N = Nominal N
+  
   record Theory {i} : Set (lsuc i) where
     field
       term : Set i
@@ -14,13 +21,13 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
 
     data term : Set i where
       · : term
-      _,_∶_ : term → name → T.judgement → term
+      _,_∶_ : term → N.name → T.judgement → term
     infixl 9 _,_∶_
 
     data judgement : Set i where
       _ctx : term → judgement
-      _∉_ : name → term → judgement
-      _∋_∶_ : term → name → T.judgement → judgement
+      _∉_ : N.name → term → judgement
+      _∋_∶_ : term → N.name → T.judgement → judgement
       _≤_ : term → term → judgement
       
     infixl 8 _ctx
@@ -37,7 +44,7 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
       x∉· : ∀ {x}
         → ⟦ x ∉ · ⟧
       x∉Γ,y∶J : ∀ {Γ x y J}
-        → x ≠ y
+        → x N.≠ y
         → ⟦ x ∉ Γ , y ∶ J ⟧
 
       Γ,x∶J∋x∶J : ∀ {Γ x J}
@@ -108,9 +115,9 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
 
     data term : Set where
       • : term
-      λ⟨_⟩_ : name → term → term
+      λ⟨_⟩_ : N.name → term → term
       abort_ : term → term
-      var⟨_⟩ : name → term
+      var⟨_⟩ : N.name → term
       app : term → term → term
 
     thy : Theory
@@ -216,7 +223,7 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
     coh (Logic.⊃-elim D E) = ⊃-elim-eq (coh D) (coh E)
     coh (Logic.hyp⟨ x ⟩) = hyp-eq⟨ x ⟩
 
-    module example {x : name} where
+    module example {x : N.name} where
       ex₁ : ⟦ λ⟨ x ⟩ abort var⟨ x ⟩ ∈ ⊥ ⊃ ⊤ [ · ] ⟧
       ex₁ =
         ⊃-member-eq⟨ x ⟩
