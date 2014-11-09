@@ -218,10 +218,19 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
 
     module example {x : name} where
       ex₁ : ⟦ λ⟨ x ⟩ abort var⟨ x ⟩ ∈ ⊥ ⊃ ⊤ [ · ] ⟧
-      ex₁ = ⊃-member-eq⟨ x ⟩ ⊥-elim-eq hyp-eq⟨ x ⟩
+      ex₁ =
+        ⊃-member-eq⟨ x ⟩
+        ⊥-elim-eq
+        hyp-eq⟨ x ⟩
 
       ex₂ : ⟦ ⊥ ⊃ ⊤ true-[ · ] ⟧
-      ex₂ = ⊃-intro⟨ x ⟩ ⊥-elim hyp⟨ x ⟩
+      ex₂ =
+        ⊃-intro⟨ x ⟩
+        ⊥-elim
+        hyp⟨ x ⟩
 
       ex₃ : ⟦ ⊥ ⊃ ⊤ true-[ · ] ⟧
-      ex₃ = witness⟨ λ⟨ x ⟩ abort var⟨ x ⟩  ⟩ ex₁
+      ex₃ =
+        witness⟨
+          λ⟨ x ⟩ abort var⟨ x ⟩
+        ⟩ ex₁
