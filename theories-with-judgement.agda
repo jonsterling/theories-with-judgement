@@ -140,6 +140,16 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
     thy = record { term = term ; judgement = judgement ; ⟦_⟧ = ⟦_⟧ }
 
     data ⟦_⟧ where
+
+      eq-sym : ∀ {Γ M N A}
+        → ⟦ M == N ∈ A [ Γ ] ⟧
+        → ⟦ N == M ∈ A [ Γ ] ⟧
+
+      eq-trans : ∀ {Γ M N O A}
+        → ⟦ M == N ∈ A [ Γ ] ⟧
+        → ⟦ N == O ∈ A [ Γ ] ⟧
+        → ⟦ M == O ∈ A [ Γ ] ⟧
+
       ⊤-intro : ∀ {Γ}
         → ⟦ ⊤ true-[ Γ ] ⟧
       ⊤-member-eq : ∀ {Γ}
@@ -202,6 +212,8 @@ module Framework (name : Set) (_≠_ : name → name → Set) where
     ⊃-member-eq⟨_⟩ _ _ ° = •
     ⊃-elim-eq _ _ ° = •
     hyp-eq⟨_⟩ _ _ _ ° = •
+    eq-sym _ ° = •
+    eq-trans _ _ ° = •
 
     -- The computational realizers are well-typed in the type theory.
     coh : ∀ {Γ P} (D : Logic.⟦ P true-[ Γ ] ⟧) → ⟦ ⌜ D ⌝ ° ∈ P [ Γ ] ⟧
