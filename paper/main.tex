@@ -105,7 +105,8 @@ following syntax and judgements:
 \begin{align*}
   (-\;\mathrm{ctx}) &: \mathcal{J}_{\mathbf{Ctx}[\mathbf{T}]}^{\mathcal{L}_{\mathbf{Ctx}[\mathbf{T}]}}\\
   (-\notin-) &: \mathcal{J}_{\mathbf{Ctx}[\mathbf{T}]}^{\mathcal{L}_\mathbf{Nm}\times\mathcal{L}_{\mathbf{Ctx}[\mathbf{T}]}}\\
-  (-\ni-:-) &: \mathcal{J}_{\mathbf{Ctx}[\mathbf{T}]}^{\mathcal{L}_{\mathbf{Ctx}[\mathbf{T}]}\times\mathcal{L}_\mathbf{Nm}\times\mathcal{J}_\mathbf{T}}
+  (-\ni-:-) &: \mathcal{J}_{\mathbf{Ctx}[\mathbf{T}]}^{\mathcal{L}_{\mathbf{Ctx}[\mathbf{T}]}\times\mathcal{L}_\mathbf{Nm}\times\mathcal{J}_\mathbf{T}}\\
+  (-\leq-) &: \mathcal{J}_{\mathbf{Ctx}[\mathbf{T}]}^{\mathcal{L}_{\mathbf{Ctx}[\mathbf{T}]}\times\mathcal{L}_{\mathbf{Ctx}[\mathbf{T}]}}
 \end{align*}
 
 And the meanings of these judgements are given inductive-recursively in terms of the
@@ -113,28 +114,34 @@ following rules:
 \begin{gather*}
   \infer{\cdot\;\mathrm{ctx}}{}
   \qquad
-  \infer[(x\in \mathcal{L}_\mathbf{Nm})]{
+  \infer{
     \Gamma,x:J\;\mathrm{ctx}
   }{
     \Gamma\;\mathrm{ctx}
     & x\notin\Gamma
   }\\[6pt]
-  \infer[(x\in \mathcal{L}_\mathbf{Nm})]{
-    x\notin\cdot
-  }{}
+  \infer{x\notin\cdot}{}
   \qquad
-  \infer[(x,y \in \mathcal{L}_\mathbf{Nm})]{
+  \infer{
     x\notin(\Gamma,y:J)
   }{
     x\notin\Gamma
     & x\mathop{\#}y
   }\\[6pt]
-  \infer[(x\in \mathcal{L}_\mathbf{Nm})]{\Gamma,x:J\ni x:J}{}
+  \infer{\Gamma,x:J\ni x:J}{}
   \qquad
-  \infer[(x,y\in \mathcal{L}_\mathbf{Nm})]{
+  \infer{
     \Gamma,x:J\ni y:J'
   }{
     \Gamma\ni y:J'
+  }\\[6pt]
+  \infer{\cdot\leq\Gamma}{}
+  \qquad
+  \infer{
+    \Delta,x:J\leq\Gamma
+  }{
+    \Delta\leq\Gamma &
+    \Gamma\ni x:J
   }
 \end{gather*}
 
@@ -206,6 +213,12 @@ following rules:
   }{
     P\supset Q\;\mathrm{true}\;[\Gamma] &
     P\;\mathrm{true}\;[\Gamma]
+  }\\[6pt]
+  \infer{
+    P\;\mathrm{true}\;[\Gamma]
+  }{
+    \Gamma\ni x:P\;\mathrm{true}\;[\Delta] &
+    \Delta\leq\Gamma
   }
 \end{gather*}
 
