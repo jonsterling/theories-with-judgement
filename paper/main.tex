@@ -1,0 +1,213 @@
+\documentclass{amsart}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{dsfont}
+\usepackage{multicol}
+\usepackage{proof}
+\usepackage{setspace}
+\usepackage{stmaryrd}
+
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{cor}[thm]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[thm]{Definition}
+\newtheorem{example}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem{remark}[thm]{Remark}
+
+\numberwithin{equation}{section}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\formation}[1]{\text{$#1$-formation}}
+\newcommand{\intro}[1]{\text{$#1$-intro}}
+\newcommand{\elim}[1]{\text{$#1$-elim}}
+\newcommand{\extensionality}[1]{\text{$#1$-ext}}
+\newcommand{\qbox}[1]{\lbrack#1\rbrack}
+\newcommand{\pair}[1]{\langle#1\rangle}
+\newcommand{\singsym}{\mathbb{S}}
+\newcommand{\sing}[2]{\singsym_{#1}(#2)}
+\newcommand{\univ}{\mathbb{U}}
+\newcommand{\void}{\mathbf{0}}
+\newcommand{\unit}{\mathbf{1}}
+\newcommand{\SET}{\textbf{Set}}
+\newcommand{\sem}[1]{\left\llbracket#1\right\rrbracket}
+\newcommand{\quo}[1]{\left\langle#1\right\rangle}
+% \DeclareMathOperator{\dist}{dist} % The distance.
+% \DeclareMathOperator{\dist}{dist} % The distance.
+
+\begin{document}
+\title{Theories with Judgement}
+\author{Jonathan Sterling}
+\address{AlephCloud Systems}
+\email{jon@jonmsterling.com}
+
+\maketitle
+
+A \emph{Theory} is given by a language $\mathcal{L}$, an inductively defined set of judgements
+$\mathcal{J}$, and an explanation of their meaning $\sem{-} :
+\SET^\mathcal{J}$.  One such theory is the theory $\mathbf{Nat}$ of the natural
+numbers, whose terms are the numerals:
+\[
+  \begin{array}{lcl}
+    \mathcal{L}_\mathbf{Nat}
+      &::= &\mathsf{zero}\\
+      &\mid &\mathsf{succ}\;\quo{\mathcal{L}_\mathbf{Nat}}
+  \end{array}
+\]
+The theory $\mathbf{Nat}$ has only a single form of judgement, which asserts that a term is a natural number.
+\[
+  \mathcal{J}_\mathbf{Nat} = \{n\;\mathrm{nat} \mid n : \mathcal{L}_\mathbf{Nat} \}
+\]
+The judgement is then interpreted over the syntax recursively:
+\begin{align*}
+  \sem{\mathsf{zero}\;\mathrm{nat}}_\mathbf{Nat} &= \top\\
+  \sem{\mathsf{succ}\;n\;\mathrm{nat}}_\mathbf{Nat} &= \sem{n\;\mathrm{nat}}_\mathbf{Nat}
+\end{align*}
+Going forward, we'll equivalently present the judgements and their
+interpretations in terms of ``canonical constructors'' in the ambient
+metalanguage, as follows:
+\begin{align*}
+  (-\;\mathrm{nat}) &: \mathcal{J}_\mathbf{Nat}^{\mathcal{L}_\mathbf{Nat}}
+\end{align*}
+\begin{gather*}
+  \infer{\mathsf{zero}\;\mathrm{nat}}{}
+  \qquad
+  \infer{\mathsf{succ}\;n\;\mathrm{nat}}{n\;\mathrm{nat}}
+\end{gather*}
+Now, this is not a particularly interesting theory, since its single form of
+judgement is true at all instantiations, but it served to illustrate the
+construction of a theory with judgement.
+
+A more interesting theory is that of names, $\mathbf{Nm}$; we take
+$\mathcal{L}_\mathbf{Nm}$ to be the countably infinite set of strings of
+letters $abc...$ Then, the judgements are given as follows:
+\begin{align*}
+  (-\mathop{\#}-) &: \mathcal{J}_\mathbf{Nm}^{\mathcal{L}_\mathbf{Nm}\times\mathcal{L}_\mathbf{Nm}}
+  \tag{Apartness}
+\end{align*}
+We can take the interpretation of the apartness judgement as primitive.
+
+Now we can define the theory of contexts of assumptions over some other theory
+$\mathbf{T}$, which we will call $\mathbf{Ctx}[\mathbf{T}]$; we introduce the
+following syntax and judgements:
+\[
+  \begin{array}{lcl}
+    \mathcal{L}_{\mathbf{Ctx}[\mathbf{T}]}
+      &::= &\cdot\\
+      &\mid & \quo{\mathcal{L}_{\mathbf{Ctx}[\mathbf{T}]}},\quo{\mathcal{L}_\mathbf{Nm}}:\quo{\mathcal{J}_\mathbf{T}}
+  \end{array}
+\]
+
+\begin{align*}
+  (-\;\mathrm{ctx}) &: \mathcal{J}_{\mathbf{Ctx}[\mathbf{T}]}^{\mathcal{L}_{\mathbf{Ctx}[\mathbf{T}]}}\\
+  (-\notin-) &: \mathcal{J}_{\mathbf{Ctx}[\mathbf{T}]}^{\mathcal{L}_\mathbf{Nm}\times\mathcal{L}_{\mathbf{Ctx}[\mathbf{T}]}}\\
+  (-\ni-:-) &: \mathcal{J}_{\mathbf{Ctx}[\mathbf{T}]}^{\mathcal{L}_{\mathbf{Ctx}[\mathbf{T}]}\times\mathcal{L}_\mathbf{Nm}\times\mathcal{J}_\mathbf{T}}
+\end{align*}
+
+And the meanings of these judgements are given inductive-recursively in terms of the
+following rules:
+\begin{gather*}
+  \infer{\cdot\;\mathrm{ctx}}{}
+  \qquad
+  \infer[(x\in \mathcal{L}_\mathbf{Nm})]{
+    \Gamma,x:J\;\mathrm{ctx}
+  }{
+    \Gamma\;\mathrm{ctx}
+    & x\notin\Gamma
+  }\\[6pt]
+  \infer[(x\in \mathcal{L}_\mathbf{Nm})]{
+    x\notin\cdot
+  }{}
+  \qquad
+  \infer[(x,y \in \mathcal{L}_\mathbf{Nm})]{
+    x\notin(\Gamma,y:J)
+  }{
+    x\notin\Gamma
+    & x\mathop{\#}y
+  }\\[6pt]
+  \infer[(x\in \mathcal{L}_\mathbf{Nm})]{\Gamma,x:J\ni x:J}{}
+  \qquad
+  \infer[(x,y\in \mathcal{L}_\mathbf{Nm})]{
+    \Gamma,x:J\ni y:J'
+  }{
+    \Gamma\ni y:J'
+  }
+\end{gather*}
+
+Finally, we can iterate the process in order to get a theory $\mathbf{IPC}$ of
+intuitionistic propositional logic, which introduces a notion of hypothetical
+judgement: but note that we did not need to include that as part of the general
+framework, since we have defined it internally in the theory of contexts above.
+\[
+  \begin{array}{lcl}
+    \mathcal{L}_\mathbf{IPC}
+      &::= &\bot\\
+      &\mid &\top\\
+      &\mid &\quo{\mathcal{L}_\mathbf{IPC}}\land\quo{\mathcal{L}_\mathbf{IPC}}\\
+      &\mid &\quo{\mathcal{L}_\mathbf{IPC}}\lor\quo{\mathcal{L}_\mathbf{IPC}}\\
+      &\mid &\quo{\mathcal{L}_\mathbf{IPC}}\supset\quo{\mathcal{L}_\mathbf{IPC}}
+  \end{array}
+\]
+The theory has a single form of judgement,
+\[
+  -\;\mathrm{true}\;[-] : \mathcal{J}_\mathbf{IPC}^{\mathcal{L}_\mathbf{IPC}\times\mathcal{L}_{\mathbf{Ctx}[\mathbf{IPC}]}}
+\]
+The definition of the theory $\mathbf{IPC}$ is circular, but not viciously so;
+it is inductive-recursive. Then, the meaning of this judgement is given by the
+following rules:
+\begin{gather*}
+  \infer{\top\;\mathrm{true}\;[\Gamma]}{}
+  \qquad
+  \infer{P\;\mathrm{true}\;[\Gamma]}{\bot\;\mathrm{true}\;[\Gamma]}\\[6pt]
+  \infer{
+    P\land Q\;\mathrm{true}\;[\Gamma]
+  }{
+    P\;\mathrm{true}\;[\Gamma] &
+    Q\;\mathrm{true}\;[\Gamma]
+  }
+  \qquad
+  \infer{
+    R\;\mathrm{true}\;[\Gamma]
+  }{
+    P\land Q\;\mathrm{true}\;[\Gamma] &
+    R\;\mathrm{true}\;[\Gamma,x:P\;\mathrm{true}\;[\Gamma];y:Q\;\mathrm{true}\;[\Gamma,x:P\;\mathrm{true}\;[\Gamma]]]
+  }\\[6pt]
+  \infer{
+    P\;\mathrm{true}\;[\Gamma]
+  }{
+    P\lor Q\;\mathrm{true}\;[\Gamma]
+  }
+  \qquad
+  \infer{
+    Q\;\mathrm{true}\;[\Gamma]
+  }{
+    P\lor Q\;\mathrm{true}\;[\Gamma]
+  }
+  \qquad
+  \infer{
+    R\;\mathrm{true}\;[\Gamma]
+  }{
+    P\lor Q\;\mathrm{true}\;[\Gamma] &
+    R\;\mathrm{true}\;[\Gamma,x:P\;\mathrm{true}\;[\Gamma]] &
+    R\;\mathrm{true}\;[\Gamma,x:Q\;\mathrm{true}\;[\Gamma]]
+  }\\[6pt]
+  \infer{
+    P\supset Q\;\mathrm{true}\;[\Gamma]
+  }{
+    Q\;\mathrm{true}\;[\Gamma,x:P\;\mathrm{true}\;[\Gamma]]
+  }
+  \qquad
+  \infer{
+    Q\;\mathrm{true}\;[\Gamma]
+  }{
+    P\supset Q\;\mathrm{true}\;[\Gamma] &
+    P\;\mathrm{true}\;[\Gamma]
+  }
+\end{gather*}
+
+\end{document}
+
